@@ -35,33 +35,49 @@ layout: default
 
            function seekTo(time){
 		          	SewisePlayer.doSeek(time);
-		       }       
+		       }  
+
+          var hlsjs; 
+
+          var config={
+		        elid:"player",
+				server: 'vod',
+				type: 'm3u8',
+				hlsjs:true,
+				videourl: '{{ page.video}}',
+				poster: '{% if page.cover %}{{ page.cover }}{% endif %}',
+				skin: 'vodFlowPlayer',
+				title: '',
+				logo: '{{ "/assets/images/dot.gif" | prepend: site.qiniubaseurl }}',
+				lang: 'zh_CN',
+				autostart: vautostart,
+				topbardisplay: 'disable',
+				controlbardisplay: 'enable',
+				claritybutton: "disable",
+				starttime: vstarttime,
+          };		  
            
-           SewisePlayer.setup({
-                      server: 'vod',
-                      type: 'm3u8',
-                      videourl: '{{ page.video}}',
-                      poster: '{% if page.cover %}{{ page.cover }}{% endif %}',
-                      skin: 'vodFlowPlayer',
-                      title: '',
-                      logo: '{{ "/assets/images/dot.gif" | prepend: site.qiniubaseurl }}',
-                      lang: 'zh_CN',
-                      autostart: vautostart,
-                      topbardisplay: 'disable',
-                      controlbardisplay: 'enable',
-                      claritybutton: "disable",
-                      starttime: vstarttime,
-            }, "player");
-          
-      {% if Ad.image %}  
+			$(document).ready(dowReady);
+			
+			var player; 
+		    var hlsjs; 
+		    function dowReady(){
+		       player = new Sewise.SewisePlayer(config);
+		       if(Sewise.SewisePlayer.supportHls){//判断是否支持浏览器播放m3u8
+		          hlsjs = new SewiseHlsJs();
+		          player.plugins={"hls":hlsjs};	//注册插件
+		       }
+			   player.startup();//启动播放器
+			   
+		 {% if Ad.image %}  
       
           var play = 0;
           
-          SewisePlayer.onStart(function(id){
+          player.onStart(function(id){
              play = 1;
           });           
 
-          SewisePlayer.onPause(function(id){
+          player.onPause(function(id){
 			      if(!/Android|Windows Phone|webOS|iPhone|iPad|BlackBerry/i.test(navigator.userAgent)){ 
               if( play == 1 ){
                 layer.open({
@@ -84,6 +100,9 @@ layout: default
            }); 
                     
        {% endif %}   
+			   
+		    }
+       
           </script>         
            
            </div>
